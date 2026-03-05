@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strategic Focus Items</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #edeff2;
+            font-family: 'Poppins', sans-serif;
+            color: #111827;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 32px 24px;
+        }
+
+        .header {
+            margin-bottom: 32px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .card {
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .card-title {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #6b7280;
+            margin-bottom: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #111827;
+            margin-bottom: 6px;
+        }
+
+        .form-control {
+            width: 100%;
+            background: #fff;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 13px;
+            color: #111827;
+            font-family: inherit;
+            outline: none;
+            transition: all 0.15s;
+        }
+
+        .form-control:focus {
+            border-color: #00d2a9;
+            box-shadow: 0 0 0 3px rgba(0, 210, 169, 0.1);
+        }
+
+        textarea.form-control {
+            min-height: 60px;
+            resize: vertical;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 10px 16px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: #162b3c;
+            color: #fff;
+            width: 100%;
+            justify-content: center;
+            margin-top: 16px;
+        }
+
+        .btn-primary:hover {
+            background: #1e3a50;
+        }
+
+        .btn-danger {
+            background: transparent;
+            color: #dc2626;
+            font-size: 12px;
+            padding: 4px 8px;
+        }
+
+        .btn-danger:hover {
+            background: #fef2f2;
+        }
+
+        .items-list {
+            display: grid;
+            gap: 16px;
+        }
+
+        .item-card {
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 20px 24px;
+            transition: all 0.15s;
+        }
+
+        .item-card:hover {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border-color: #d1d5db;
+        }
+
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .item-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 8px;
+        }
+
+        .item-outcome {
+            font-size: 13px;
+            color: #374151;
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+
+        .badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            font-weight: 500;
+            padding: 4px 10px;
+            border-radius: 6px;
+        }
+
+        .badge-revenue {
+            background: #ecfdf5;
+            color: #059669;
+        }
+
+        .badge-cost {
+            background: #eff6ff;
+            color: #2563eb;
+        }
+
+        .badge-efficiency {
+            background: #f3e8ff;
+            color: #7e22ce;
+        }
+
+        .badge-status {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        .badge-status.open {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        .badge-status.in-progress {
+            background: #fffbeb;
+            color: #d97706;
+        }
+
+        .badge-status.blocked {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        .badge-status.done {
+            background: #ecfdf5;
+            color: #059669;
+        }
+
+        .item-controls {
+            display: flex;
+            gap: 8px;
+            padding-top: 12px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .item-controls select {
+            font-size: 12px;
+            padding: 6px 10px;
+            background: #f9fafb;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            color: #374151;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 48px 24px;
+            color: #6b7280;
+        }
+
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .summary-stat {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .summary-label {
+            font-size: 12px;
+            color: #6b7280;
+            margin-bottom: 4px;
+        }
+
+        .summary-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #162b3c;
+        }
+
+        .summary-value.revenue {
+            color: #059669;
+        }
+
+        .summary-value.cost {
+            color: #2563eb;
+        }
+
+        .summary-value.efficiency {
+            color: #7e22ce;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>Strategic Focus Items</h1>
+            <p>Document items, outcomes, lenses (Revenue/Cost/Efficiency), and prioritize for two-week focus sprints with Sean.</p>
+        </div>
+
+        <!-- Form -->
+        <div class="card">
+            <div class="card-title">Add New Item</div>
+            <form id="addForm">
+                <div class="form-group">
+                    <label class="form-label">Item (What needs to be done)</label>
+                    <input type="text" id="item" class="form-control" placeholder="E.g., Automate payroll commissions" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Outcome (What we get)</label>
+                    <textarea id="outcome" class="form-control" placeholder="E.g., Payroll team saves 8 hours/week; accuracy improves; fewer disputes" required></textarea>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Lens</label>
+                        <select id="lens" class="form-control" required>
+                            <option value="Revenue">Revenue</option>
+                            <option value="Cost" selected>Cost</option>
+                            <option value="Efficiency">Efficiency</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Owner</label>
+                        <select id="owner" class="form-control" required>
+                            <option value="Don" selected>Don</option>
+                            <option value="Sean">Sean</option>
+                            <option value="TBD">TBD</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Status</label>
+                        <select id="status" class="form-control" required>
+                            <option value="Open" selected>Open</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Blocked">Blocked</option>
+                            <option value="Done">Done</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Target Date</label>
+                        <input type="date" id="targetDate" class="form-control" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Add Item</button>
+            </form>
+        </div>
+
+        <!-- Items List -->
+        <div id="itemsList" class="items-list"></div>
+
+        <!-- Summary -->
+        <div id="summary"></div>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'strategic-focus-items';
+
+        function loadItems() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            return saved ? JSON.parse(saved) : [];
+        }
+
+        function saveItems(items) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+        }
+
+        function daysUntilDue(targetDate) {
+            const today = new Date();
+            const target = new Date(targetDate);
+            return Math.ceil((target.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+        }
+
+        function getBadgeClass(lens) {
+            const map = {
+                'Revenue': 'badge-revenue',
+                'Cost': 'badge-cost',
+                'Efficiency': 'badge-efficiency'
+            };
+            return map[lens] || '';
+        }
+
+        function getStatusClass(status) {
+            return status.toLowerCase().replace(' ', '-');
+        }
+
+        function renderItems() {
+            const items = loadItems();
+            const listEl = document.getElementById('itemsList');
+            const summaryEl = document.getElementById('summary');
+
+            if (items.length === 0) {
+                listEl.innerHTML = '<div class="card empty-state">No items yet. Add your first strategic focus item above.</div>';
+                summaryEl.innerHTML = '';
+                return;
+            }
+
+            let html = '';
+            items.forEach(item => {
+                const days = daysUntilDue(item.targetDate);
+                const daysClass = days <= 7 ? '#dc2626' : '#6b7280';
+
+                html += `
+                    <div class="item-card">
+                        <div class="item-header">
+                            <div style="flex: 1;">
+                                <div class="item-title">${item.item}</div>
+                                <div class="item-outcome">${item.outcome}</div>
+                            </div>
+                            <button class="btn btn-danger" onclick="deleteItem('${item.id}')">✕</button>
+                        </div>
+
+                        <div class="badges">
+                            <span class="badge ${getBadgeClass(item.lens)}">${item.lens}</span>
+                            <span class="badge badge-status ${getStatusClass(item.status)}">${item.status}</span>
+                            <span class="badge badge-status">Owner: ${item.owner}</span>
+                            <span class="badge badge-status" style="color: ${daysClass};">${item.targetDate} (${days}d)</span>
+                        </div>
+
+                        <div class="item-controls">
+                            <select onchange="updateStatus('${item.id}', this.value)">
+                                <option value="Open" ${item.status === 'Open' ? 'selected' : ''}>Open</option>
+                                <option value="In Progress" ${item.status === 'In Progress' ? 'selected' : ''}>In Progress</option>
+                                <option value="Blocked" ${item.status === 'Blocked' ? 'selected' : ''}>Blocked</option>
+                                <option value="Done" ${item.status === 'Done' ? 'selected' : ''}>Done</option>
+                            </select>
+                            <select onchange="updateDate('${item.id}', this.value)">
+                                <option value="${item.targetDate}" selected>${item.targetDate}</option>
+                                <option value="">Change date...</option>
+                            </select>
+                        </div>
+                    </div>
+                `;
+            });
+
+            listEl.innerHTML = html;
+
+            // Summary
+            const revenueCount = items.filter(i => i.lens === 'Revenue').length;
+            const costCount = items.filter(i => i.lens === 'Cost').length;
+            const efficiencyCount = items.filter(i => i.lens === 'Efficiency').length;
+
+            summaryEl.innerHTML = `
+                <div class="card">
+                    <div class="card-title">Summary</div>
+                    <div class="summary">
+                        <div class="summary-stat">
+                            <span class="summary-label">Total Items</span>
+                            <span class="summary-value">${items.length}</span>
+                        </div>
+                        <div class="summary-stat">
+                            <span class="summary-label">Revenue Focus</span>
+                            <span class="summary-value revenue">${revenueCount}</span>
+                        </div>
+                        <div class="summary-stat">
+                            <span class="summary-label">Cost Focus</span>
+                            <span class="summary-value cost">${costCount}</span>
+                        </div>
+                        <div class="summary-stat">
+                            <span class="summary-label">Efficiency Focus</span>
+                            <span class="summary-value efficiency">${efficiencyCount}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function addItem(e) {
+            e.preventDefault();
+
+            const item = {
+                id: Date.now().toString(),
+                item: document.getElementById('item').value,
+                outcome: document.getElementById('outcome').value,
+                lens: document.getElementById('lens').value,
+                owner: document.getElementById('owner').value,
+                status: document.getElementById('status').value,
+                targetDate: document.getElementById('targetDate').value,
+                createdAt: new Date().toISOString()
+            };
+
+            const items = loadItems();
+            items.unshift(item);
+            saveItems(items);
+
+            document.getElementById('addForm').reset();
+            renderItems();
+        }
+
+        function deleteItem(id) {
+            if (confirm('Delete this item?')) {
+                const items = loadItems();
+                saveItems(items.filter(i => i.id !== id));
+                renderItems();
+            }
+        }
+
+        function updateStatus(id, status) {
+            const items = loadItems();
+            const item = items.find(i => i.id === id);
+            if (item) {
+                item.status = status;
+                saveItems(items);
+                renderItems();
+            }
+        }
+
+        function updateDate(id, date) {
+            if (!date) return;
+            const items = loadItems();
+            const item = items.find(i => i.id === id);
+            if (item) {
+                item.targetDate = date;
+                saveItems(items);
+                renderItems();
+            }
+        }
+
+        document.getElementById('addForm').addEventListener('submit', addItem);
+        renderItems();
+    </script>
+</body>
+</html>
