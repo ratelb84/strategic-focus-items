@@ -3,531 +3,756 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <title>Strategic Focus Items</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: { extend: { fontFamily: { sans: ['Poppins', 'system-ui', 'sans-serif'] } } }
+        }
+    </script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        body { background: #edeff2; }
+        .sidebar { background: #162b3c; }
+        .nav-item { color: rgba(255,255,255,0.6); transition: all 0.15s; font-size: 13px; padding: 8px 16px; border-radius: 6px; display: flex; align-items: center; gap: 10px; cursor: pointer; margin: 1px 8px; }
+        .nav-item:hover { color: #fff; background: rgba(0,210,169,0.1); }
+        .nav-item.active { color: #00d2a9; background: rgba(0,210,169,0.12); }
+        .nav-item svg { width: 18px; height: 18px; opacity: 0.6; }
+        .nav-item.active svg { opacity: 1; }
+        .card { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; }
+        .card-header { padding: 20px 24px; border-bottom: 1px solid #f0f0f0; }
+        .stat-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 16px 20px; }
+        .badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 9999px; }
+        .badge-green { background: #ecfdf5; color: #059669; }
+        .badge-amber { background: #fffbeb; color: #d97706; }
+        .badge-red { background: #fef2f2; color: #dc2626; }
+        .badge-blue { background: #eff6ff; color: #2563eb; }
+        .badge-purple { background: #f3e8ff; color: #7e22ce; }
+        .badge-gray { background: #f3f4f6; color: #6b7280; }
+        .btn { font-size: 13px; font-weight: 500; padding: 8px 16px; border-radius: 8px; cursor: pointer; transition: all 0.15s; border: none; display: inline-flex; align-items: center; gap: 6px; }
+        .btn-primary { background: #162b3c; color: #fff; }
+        .btn-primary:hover { background: #1e3a50; }
+        .btn-teal { background: #00d2a9; color: #fff; }
+        .btn-teal:hover { background: #00b894; }
+        .btn-secondary { background: #fff; color: #374151; border: 1px solid #d1d5db; }
+        .btn-secondary:hover { background: #f9fafb; }
+        .btn-danger { color: #dc2626; background: transparent; padding: 4px 8px; font-size: 12px; cursor: pointer; }
+        .btn-danger:hover { background: #fef2f2; border-radius: 6px; }
+        .input-field { background: #fff; border: 1px solid #d1d5db; border-radius: 6px; padding: 7px 12px; font-size: 13px; color: #111827; outline: none; font-family: inherit; }
+        .input-field:focus { border-color: #00d2a9; box-shadow: 0 0 0 3px rgba(0,210,169,0.1); }
+        .select-field { background: #fff; border: 1px solid #d1d5db; border-radius: 8px; padding: 7px 12px; font-size: 13px; color: #111827; outline: none; font-family: inherit; cursor: pointer; }
+        .select-field:focus { border-color: #00d2a9; box-shadow: 0 0 0 3px rgba(0,210,169,0.1); }
+        .topbar { background: #fff; border-bottom: 1px solid #e5e7eb; }
+        .scroll-area::-webkit-scrollbar { width: 6px; }
+        .scroll-area::-webkit-scrollbar-track { background: transparent; }
+        .scroll-area::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
+        textarea.input-field { resize: vertical; min-height: 56px; }
 
-        body {
-            background: #edeff2;
-            font-family: 'Poppins', sans-serif;
-            color: #111827;
-            min-height: 100vh;
-        }
+        /* Lane styling */
+        .lane { background: #f3f4f6; border-radius: 12px; min-height: 400px; display: flex; flex-direction: column; }
+        .lane-header { padding: 16px 20px; border-radius: 12px 12px 0 0; }
+        .lane-high .lane-header { background: linear-gradient(135deg, #fef2f2, #fee2e2); border-bottom: 2px solid #fca5a5; }
+        .lane-medium .lane-header { background: linear-gradient(135deg, #fffbeb, #fef3c7); border-bottom: 2px solid #fcd34d; }
+        .lane-low .lane-header { background: linear-gradient(135deg, #eff6ff, #dbeafe); border-bottom: 2px solid #93c5fd; }
+        .lane-body { padding: 12px; flex: 1; min-height: 200px; }
+        .lane-body.drag-over { background: rgba(0,210,169,0.08); border-radius: 0 0 12px 12px; }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 32px 24px;
-        }
-
-        .header {
-            margin-bottom: 32px;
-        }
-
-        .header h1 {
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .header p {
-            font-size: 14px;
-            color: #6b7280;
-        }
-
-        .card {
-            background: #fff;
-            border: 1px solid #e5e7eb;
-            border-radius: 12px;
-            padding: 24px;
-            margin-bottom: 24px;
-        }
-
-        .card-title {
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: #6b7280;
-            margin-bottom: 16px;
-        }
-
-        .form-group {
-            margin-bottom: 16px;
-        }
-
-        .form-label {
-            display: block;
-            font-size: 13px;
-            font-weight: 500;
-            color: #111827;
-            margin-bottom: 6px;
-        }
-
-        .form-control {
-            width: 100%;
-            background: #fff;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            padding: 8px 12px;
-            font-size: 13px;
-            color: #111827;
-            font-family: inherit;
-            outline: none;
-            transition: all 0.15s;
-        }
-
-        .form-control:focus {
-            border-color: #00d2a9;
-            box-shadow: 0 0 0 3px rgba(0, 210, 169, 0.1);
-        }
-
-        textarea.form-control {
-            min-height: 60px;
-            resize: vertical;
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
-            margin-top: 16px;
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 13px;
-            font-weight: 500;
-            padding: 10px 16px;
-            border-radius: 8px;
-            border: none;
-            cursor: pointer;
-            transition: all 0.15s;
-            font-family: inherit;
-        }
-
-        .btn-primary {
-            background: #162b3c;
-            color: #fff;
-            width: 100%;
-            justify-content: center;
-            margin-top: 16px;
-        }
-
-        .btn-primary:hover {
-            background: #1e3a50;
-        }
-
-        .btn-danger {
-            background: transparent;
-            color: #dc2626;
-            font-size: 12px;
-            padding: 4px 8px;
-        }
-
-        .btn-danger:hover {
-            background: #fef2f2;
-        }
-
-        .items-list {
-            display: grid;
-            gap: 16px;
-        }
-
-        .item-card {
-            background: #fff;
-            border: 1px solid #e5e7eb;
-            border-radius: 12px;
-            padding: 20px 24px;
-            transition: all 0.15s;
-        }
-
-        .item-card:hover {
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-            border-color: #d1d5db;
-        }
-
-        .item-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 12px;
-        }
-
-        .item-title {
-            font-size: 14px;
-            font-weight: 600;
-            color: #111827;
-            margin-bottom: 8px;
-        }
-
-        .item-outcome {
-            font-size: 13px;
-            color: #374151;
-            line-height: 1.5;
-            margin-bottom: 12px;
-        }
-
-        .badges {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 12px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid #f0f0f0;
-        }
-
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            font-size: 11px;
-            font-weight: 500;
-            padding: 4px 10px;
-            border-radius: 6px;
-        }
-
-        .badge-revenue {
-            background: #ecfdf5;
-            color: #059669;
-        }
-
-        .badge-cost {
-            background: #eff6ff;
-            color: #2563eb;
-        }
-
-        .badge-efficiency {
-            background: #f3e8ff;
-            color: #7e22ce;
-        }
-
-        .badge-status {
-            background: #f3f4f6;
-            color: #6b7280;
-        }
-
-        .badge-status.open {
-            background: #f3f4f6;
-            color: #6b7280;
-        }
-
-        .badge-status.in-progress {
-            background: #fffbeb;
-            color: #d97706;
-        }
-
-        .badge-status.blocked {
-            background: #fef2f2;
-            color: #dc2626;
-        }
-
-        .badge-status.done {
-            background: #ecfdf5;
-            color: #059669;
-        }
-
-        .item-controls {
-            display: flex;
-            gap: 8px;
-            padding-top: 12px;
-            border-top: 1px solid #f0f0f0;
-        }
-
-        .item-controls select {
-            font-size: 12px;
-            padding: 6px 10px;
-            background: #f9fafb;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            color: #374151;
-            cursor: pointer;
-            font-family: inherit;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 48px 24px;
-            color: #6b7280;
-        }
-
-        .summary {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 16px;
-            margin-top: 16px;
-        }
-
-        .summary-stat {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .summary-label {
-            font-size: 12px;
-            color: #6b7280;
-            margin-bottom: 4px;
-        }
-
-        .summary-value {
-            font-size: 20px;
-            font-weight: 700;
-            color: #162b3c;
-        }
-
-        .summary-value.revenue {
-            color: #059669;
-        }
-
-        .summary-value.cost {
-            color: #2563eb;
-        }
-
-        .summary-value.efficiency {
-            color: #7e22ce;
-        }
+        /* Draggable cards */
+        .drag-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 14px 16px; margin-bottom: 10px; cursor: grab; transition: all 0.15s; }
+        .drag-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.08); border-color: #d1d5db; }
+        .drag-card:active { cursor: grabbing; }
+        .drag-card.dragging { opacity: 0.4; transform: rotate(2deg); }
+        .drag-card.drop-before { border-top: 3px solid #00d2a9; margin-top: -2px; }
+        .drag-card.drop-after { border-bottom: 3px solid #00d2a9; margin-bottom: -2px; }
+        .drag-card .card-title { font-size: 13px; font-weight: 600; color: #111827; margin-bottom: 6px; }
+        .drag-card .card-outcome { font-size: 11px; color: #6b7280; line-height: 1.4; margin-bottom: 8px; }
+        .drag-card .card-meta { display: flex; flex-wrap: wrap; gap: 4px; }
     </style>
 </head>
-<body>
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <h1>Strategic Focus Items</h1>
-            <p>Document items, outcomes, lenses (Revenue/Cost/Efficiency), and prioritize for two-week focus sprints with Sean.</p>
-        </div>
-
-        <!-- Form -->
-        <div class="card">
-            <div class="card-title">Add New Item</div>
-            <form id="addForm">
-                <div class="form-group">
-                    <label class="form-label">Item (What needs to be done)</label>
-                    <input type="text" id="item" class="form-control" placeholder="E.g., Automate payroll commissions" required>
+<body class="min-h-screen font-sans antialiased text-gray-900">
+    <div class="flex min-h-screen">
+        <!-- Sidebar -->
+        <nav class="sidebar w-60 flex flex-col flex-shrink-0 min-h-screen">
+            <div class="px-4 py-5 border-b border-white/10 flex justify-center">
+                <svg width="32" height="36" viewBox="0 0 32 36" fill="none">
+                    <path d="M16 0L30.9 8.6v17.2L16 34.4 1.1 25.8V8.6L16 0z" stroke="#00d2a9" stroke-width="2.5" fill="none"/>
+                </svg>
+            </div>
+            <div class="flex-1 py-4 space-y-0.5">
+                <div class="px-4 pb-1">
+                    <p class="text-[10px] font-semibold uppercase tracking-wider text-gray-500">Views</p>
+                </div>
+                <div onclick="showPage('board')" class="nav-item active" id="nav-board">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 4.5v15m6-15v15m-10.875 0h15.75c.621 0 1.125-.504 1.125-1.125V5.625c0-.621-.504-1.125-1.125-1.125H4.125C3.504 4.5 3 5.004 3 5.625v12.75c0 .621.504 1.125 1.125 1.125z"/></svg>
+                    Priority Board
+                </div>
+                <div onclick="showPage('list')" class="nav-item" id="nav-list">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/></svg>
+                    List View
+                </div>
+                <div onclick="showPage('summary')" class="nav-item" id="nav-summary">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"/></svg>
+                    Summary
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label">Outcome (What we get)</label>
-                    <textarea id="outcome" class="form-control" placeholder="E.g., Payroll team saves 8 hours/week; accuracy improves; fewer disputes" required></textarea>
+                <div class="px-4 pt-5 pb-1">
+                    <p class="text-[10px] font-semibold uppercase tracking-wider text-gray-500">Filter by Lens</p>
+                </div>
+                <div onclick="setLensFilter('all')" class="nav-item active" id="nav-all">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"/></svg>
+                    All
+                </div>
+                <div onclick="setLensFilter('Revenue')" class="nav-item" id="nav-revenue">
+                    <span class="inline-block w-2.5 h-2.5 rounded-full bg-green-500 ml-0.5 mr-1"></span>
+                    Revenue
+                </div>
+                <div onclick="setLensFilter('Cost')" class="nav-item" id="nav-cost">
+                    <span class="inline-block w-2.5 h-2.5 rounded-full bg-blue-500 ml-0.5 mr-1"></span>
+                    Cost
+                </div>
+                <div onclick="setLensFilter('Efficiency')" class="nav-item" id="nav-efficiency">
+                    <span class="inline-block w-2.5 h-2.5 rounded-full bg-purple-500 ml-0.5 mr-1"></span>
+                    Efficiency
+                </div>
+            </div>
+            <div class="px-4 py-3 border-t border-white/10">
+                <p class="text-[10px] text-gray-500">Strategic Focus Items v2.0</p>
+            </div>
+        </nav>
+
+        <!-- Main -->
+        <main class="flex-1 overflow-y-auto scroll-area">
+            <!-- Top bar -->
+            <div class="topbar flex items-center justify-between px-8 py-3 sticky top-0 z-10">
+                <h2 class="text-sm font-semibold text-gray-800" id="topBarLabel">Strategic Focus Items</h2>
+                <div class="flex items-center gap-4">
+                    <button class="btn btn-teal text-xs" onclick="openAddModal()">
+                        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                        Add Item
+                    </button>
+                    <div class="h-5 w-px bg-gray-200"></div>
+                    <div class="flex items-center gap-2">
+                        <div class="h-7 w-7 rounded-full bg-[#162b3c] flex items-center justify-center text-white text-xs font-semibold">D</div>
+                        <span class="text-xs font-medium text-gray-700">Don</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== BOARD PAGE (PRIORITY LANES) ==================== -->
+            <div id="page-board" class="p-8">
+                <div class="mb-6">
+                    <h1 class="text-2xl font-bold text-gray-900">Priority Board</h1>
+                    <p class="text-sm text-gray-500 mt-1">Drag items between lanes to reprioritize. Drop into a lane to change priority.</p>
                 </div>
 
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label class="form-label">Lens</label>
-                        <select id="lens" class="form-control" required>
-                            <option value="Revenue">Revenue</option>
-                            <option value="Cost" selected>Cost</option>
-                            <option value="Efficiency">Efficiency</option>
-                        </select>
+                <!-- Summary Cards -->
+                <div class="grid grid-cols-4 gap-4 mb-6" id="summaryCards"></div>
+
+                <!-- Priority Lanes -->
+                <div class="grid grid-cols-3 gap-6" id="laneContainer">
+                    <div class="lane lane-high" id="lane-High" ondragover="handleDragOver(event)" ondrop="handleDrop(event, 'High')" ondragleave="handleDragLeave(event)">
+                        <div class="lane-header">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-lg">🔴</span>
+                                    <div>
+                                        <p class="text-sm font-bold text-red-800">HIGH</p>
+                                        <p class="text-[10px] text-red-600 font-medium">Next 30 Days</p>
+                                    </div>
+                                </div>
+                                <span class="badge badge-red" id="count-High">0</span>
+                            </div>
+                        </div>
+                        <div class="lane-body" id="body-High"></div>
                     </div>
 
-                    <div class="form-group">
-                        <label class="form-label">Owner</label>
-                        <select id="owner" class="form-control" required>
-                            <option value="Don" selected>Don</option>
-                            <option value="Sean">Sean</option>
-                            <option value="TBD">TBD</option>
-                        </select>
+                    <div class="lane lane-medium" id="lane-Medium" ondragover="handleDragOver(event)" ondrop="handleDrop(event, 'Medium')" ondragleave="handleDragLeave(event)">
+                        <div class="lane-header">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-lg">🟡</span>
+                                    <div>
+                                        <p class="text-sm font-bold text-amber-800">MEDIUM</p>
+                                        <p class="text-[10px] text-amber-600 font-medium">60–90 Days</p>
+                                    </div>
+                                </div>
+                                <span class="badge badge-amber" id="count-Medium">0</span>
+                            </div>
+                        </div>
+                        <div class="lane-body" id="body-Medium"></div>
                     </div>
 
-                    <div class="form-group">
-                        <label class="form-label">Status</label>
-                        <select id="status" class="form-control" required>
-                            <option value="Open" selected>Open</option>
+                    <div class="lane lane-low" id="lane-Low" ondragover="handleDragOver(event)" ondrop="handleDrop(event, 'Low')" ondragleave="handleDragLeave(event)">
+                        <div class="lane-header">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-lg">🔵</span>
+                                    <div>
+                                        <p class="text-sm font-bold text-blue-800">LOW</p>
+                                        <p class="text-[10px] text-blue-600 font-medium">90+ Days</p>
+                                    </div>
+                                </div>
+                                <span class="badge badge-blue" id="count-Low">0</span>
+                            </div>
+                        </div>
+                        <div class="lane-body" id="body-Low"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== LIST PAGE ==================== -->
+            <div id="page-list" class="p-8 hidden">
+                <div class="mb-6">
+                    <h1 class="text-2xl font-bold text-gray-900">All Items</h1>
+                    <p class="text-sm text-gray-500 mt-1">Full list of strategic focus items</p>
+                </div>
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs text-gray-500">Status</span>
+                        <select id="listStatusFilter" onchange="renderList()" class="select-field text-sm">
+                            <option value="all">All</option>
+                            <option value="Open">Open</option>
                             <option value="In Progress">In Progress</option>
                             <option value="Blocked">Blocked</option>
                             <option value="Done">Done</option>
                         </select>
                     </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Target Date</label>
-                        <input type="date" id="targetDate" class="form-control" required>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs text-gray-500">Priority</span>
+                        <select id="listPriorityFilter" onchange="renderList()" class="select-field text-sm">
+                            <option value="all">All</option>
+                            <option value="High">High</option>
+                            <option value="Medium">Medium</option>
+                            <option value="Low">Low</option>
+                        </select>
                     </div>
                 </div>
+                <div id="listContainer"></div>
+            </div>
 
-                <button type="submit" class="btn btn-primary">Add Item</button>
-            </form>
+            <!-- ==================== SUMMARY PAGE ==================== -->
+            <div id="page-summary" class="p-8 hidden">
+                <div class="mb-6">
+                    <h1 class="text-2xl font-bold text-gray-900">Summary</h1>
+                    <p class="text-sm text-gray-500 mt-1">Overview by lens, priority, and status</p>
+                </div>
+                <div id="summaryContent"></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add/Edit Modal -->
+    <div id="modal" class="fixed inset-0 z-50 hidden" onclick="if(event.target===this)closeModal()">
+        <div class="absolute inset-0 bg-black/30"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg">
+            <div class="card p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-base font-semibold text-gray-900" id="modalTitle">Add New Item</h3>
+                    <button class="btn-danger" onclick="closeModal()">
+                        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+                <form id="itemForm" onsubmit="saveItem(event)">
+                    <input type="hidden" id="f_id">
+                    <div class="mb-3">
+                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Item</label>
+                        <input type="text" id="f_item" class="input-field w-full" placeholder="What needs to be done?" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Outcome</label>
+                        <textarea id="f_outcome" class="input-field w-full" placeholder="What do we get from doing this?" required></textarea>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3 mb-3">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Lens</label>
+                            <select id="f_lens" class="select-field w-full">
+                                <option value="Revenue">💰 Revenue</option>
+                                <option value="Cost" selected>📉 Cost</option>
+                                <option value="Efficiency">⚡ Efficiency</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Priority</label>
+                            <select id="f_priority" class="select-field w-full">
+                                <option value="High">🔴 High (Next 30 Days)</option>
+                                <option value="Medium">🟡 Medium (60–90 Days)</option>
+                                <option value="Low">🔵 Low (90+ Days)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-3 gap-3 mb-3">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Owner</label>
+                            <select id="f_owner" class="select-field w-full">
+                                <option value="Don">Don</option>
+                                <option value="Sean">Sean</option>
+                                <option value="TBD">TBD</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Status</label>
+                            <select id="f_status" class="select-field w-full">
+                                <option value="Open">Open</option>
+                                <option value="In Progress">In Progress</option>
+                                <option value="Blocked">Blocked</option>
+                                <option value="Done">Done</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">R Saving / Increase</label>
+                            <input type="number" id="f_rValue" class="input-field w-full" placeholder="e.g. 500000" min="0" step="1000">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-teal w-full justify-center">
+                        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        <span id="modalSubmitText">Add Item</span>
+                    </button>
+                </form>
+            </div>
         </div>
-
-        <!-- Items List -->
-        <div id="itemsList" class="items-list"></div>
-
-        <!-- Summary -->
-        <div id="summary"></div>
     </div>
 
     <script>
-        const STORAGE_KEY = 'strategic-focus-items';
+        const STORAGE_KEY = 'strategic-focus-items-v2';
+        let currentPage = 'board';
+        let currentLensFilter = 'all';
+        let draggedId = null;
 
+        // ── Data ──
         function loadItems() {
             const saved = localStorage.getItem(STORAGE_KEY);
-            return saved ? JSON.parse(saved) : [];
+            if (saved) return JSON.parse(saved);
+            // migrate from v1
+            const v1 = localStorage.getItem('strategic-focus-items');
+            if (v1) {
+                const items = JSON.parse(v1).map(i => ({ ...i, priority: i.priority || 'Medium' }));
+                saveItems(items);
+                return items;
+            }
+            return [];
         }
 
         function saveItems(items) {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
         }
 
-        function daysUntilDue(targetDate) {
-            const today = new Date();
-            const target = new Date(targetDate);
-            return Math.ceil((target.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+        function getFiltered(items) {
+            if (currentLensFilter !== 'all') items = items.filter(i => i.lens === currentLensFilter);
+            return items;
         }
 
-        function getBadgeClass(lens) {
-            const map = {
-                'Revenue': 'badge-revenue',
-                'Cost': 'badge-cost',
-                'Efficiency': 'badge-efficiency'
+        // ── Helpers ──
+        function daysUntilDue(d) {
+            const today = new Date(); today.setHours(0,0,0,0);
+            return Math.ceil((new Date(d+'T00:00:00') - today) / 86400000);
+        }
+
+        function lensBadge(l) {
+            const m = { Revenue:'badge-green', Cost:'badge-blue', Efficiency:'badge-purple' };
+            const i = { Revenue:'💰', Cost:'📉', Efficiency:'⚡' };
+            return `<span class="badge ${m[l]}">${i[l]} ${l}</span>`;
+        }
+
+        function statusBadge(s) {
+            const m = { Open:'badge-gray','In Progress':'badge-amber', Blocked:'badge-red', Done:'badge-green' };
+            return `<span class="badge ${m[s]}">${s}</span>`;
+        }
+
+        function priorityBadge(p) {
+            const m = { High:'badge-red', Medium:'badge-amber', Low:'badge-blue' };
+            const i = { High:'🔴', Medium:'🟡', Low:'🔵' };
+            return `<span class="badge ${m[p]}">${i[p]} ${p}</span>`;
+        }
+
+        function formatRand(v) {
+            if (!v || v === 0) return null;
+            if (v >= 1000000) return 'R ' + (v / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
+            if (v >= 1000) return 'R ' + (v / 1000).toFixed(0) + 'K';
+            return 'R ' + v.toLocaleString();
+        }
+
+        function dateBadge(d) {
+            const days = daysUntilDue(d);
+            let cls = 'badge-gray', label = days + 'd';
+            if (days < 0) { cls = 'badge-red'; label = Math.abs(days) + 'd overdue'; }
+            else if (days <= 3) { cls = 'badge-red'; label = days + 'd left'; }
+            else if (days <= 7) { cls = 'badge-amber'; label = days + 'd left'; }
+            else { label = days + 'd left'; }
+            return `<span class="badge ${cls}">${d} · ${label}</span>`;
+        }
+
+        // ── Modal ──
+        function openAddModal(priority) {
+            document.getElementById('f_id').value = '';
+            document.getElementById('f_item').value = '';
+            document.getElementById('f_outcome').value = '';
+            document.getElementById('f_lens').value = 'Cost';
+            document.getElementById('f_priority').value = priority || 'High';
+            document.getElementById('f_owner').value = 'Don';
+            document.getElementById('f_status').value = 'Open';
+            document.getElementById('f_rValue').value = '';
+            document.getElementById('modalTitle').textContent = 'Add New Item';
+            document.getElementById('modalSubmitText').textContent = 'Add Item';
+            document.getElementById('modal').classList.remove('hidden');
+            document.getElementById('f_item').focus();
+        }
+
+        function openEditModal(id) {
+            const item = loadItems().find(i => i.id === id);
+            if (!item) return;
+            document.getElementById('f_id').value = item.id;
+            document.getElementById('f_item').value = item.item;
+            document.getElementById('f_outcome').value = item.outcome;
+            document.getElementById('f_lens').value = item.lens;
+            document.getElementById('f_priority').value = item.priority || 'Medium';
+            document.getElementById('f_owner').value = item.owner;
+            document.getElementById('f_status').value = item.status;
+            document.getElementById('f_rValue').value = item.rValue || '';
+            document.getElementById('modalTitle').textContent = 'Edit Item';
+            document.getElementById('modalSubmitText').textContent = 'Save Changes';
+            document.getElementById('modal').classList.remove('hidden');
+            document.getElementById('f_item').focus();
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.add('hidden');
+        }
+
+        function saveItem(e) {
+            e.preventDefault();
+            const id = document.getElementById('f_id').value;
+            const data = {
+                item: document.getElementById('f_item').value.trim(),
+                outcome: document.getElementById('f_outcome').value.trim(),
+                lens: document.getElementById('f_lens').value,
+                priority: document.getElementById('f_priority').value,
+                owner: document.getElementById('f_owner').value,
+                status: document.getElementById('f_status').value,
+                rValue: parseFloat(document.getElementById('f_rValue').value) || 0,
             };
-            return map[lens] || '';
-        }
 
-        function getStatusClass(status) {
-            return status.toLowerCase().replace(' ', '-');
-        }
-
-        function renderItems() {
             const items = loadItems();
-            const listEl = document.getElementById('itemsList');
-            const summaryEl = document.getElementById('summary');
+            if (id) {
+                const idx = items.findIndex(i => i.id === id);
+                if (idx >= 0) items[idx] = { ...items[idx], ...data };
+            } else {
+                items.unshift({ id: Date.now().toString(), ...data, createdAt: new Date().toISOString() });
+            }
+            saveItems(items);
+            closeModal();
+            renderAll();
+        }
 
-            if (items.length === 0) {
-                listEl.innerHTML = '<div class="card empty-state">No items yet. Add your first strategic focus item above.</div>';
-                summaryEl.innerHTML = '';
-                return;
+        function deleteItem(id) {
+            if (!confirm('Delete this item?')) return;
+            saveItems(loadItems().filter(i => i.id !== id));
+            renderAll();
+        }
+
+        // ── Drag & Drop (with reorder within lanes) ──
+        let dropTargetId = null; // id of card we're hovering over (insert before)
+        let dropIndicator = null;
+
+        function handleDragStart(e, id) {
+            draggedId = id;
+            e.target.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+        }
+
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+            document.querySelectorAll('.lane-body').forEach(b => b.classList.remove('drag-over'));
+            document.querySelectorAll('.drop-before').forEach(el => el.classList.remove('drop-before'));
+            document.querySelectorAll('.drop-after').forEach(el => el.classList.remove('drop-after'));
+            dropTargetId = null;
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            const body = e.currentTarget.querySelector('.lane-body') || e.currentTarget;
+            if (body.classList.contains('lane-body')) body.classList.add('drag-over');
+        }
+
+        function handleDragLeave(e) {
+            const body = e.currentTarget.querySelector('.lane-body') || e.currentTarget;
+            if (body.classList.contains('lane-body')) body.classList.remove('drag-over');
+        }
+
+        function handleCardDragOver(e, id) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.dataTransfer.dropEffect = 'move';
+            // Show drop indicator
+            document.querySelectorAll('.drop-before').forEach(el => el.classList.remove('drop-before'));
+            document.querySelectorAll('.drop-after').forEach(el => el.classList.remove('drop-after'));
+            const card = e.currentTarget;
+            const rect = card.getBoundingClientRect();
+            const midY = rect.top + rect.height / 2;
+            if (e.clientY < midY) {
+                card.classList.add('drop-before');
+                dropTargetId = id;
+            } else {
+                card.classList.add('drop-after');
+                dropTargetId = id + ':after';
+            }
+        }
+
+        function handleCardDragLeave(e) {
+            e.currentTarget.classList.remove('drop-before', 'drop-after');
+        }
+
+        function handleDrop(e, priority) {
+            e.preventDefault();
+            document.querySelectorAll('.lane-body').forEach(b => b.classList.remove('drag-over'));
+            document.querySelectorAll('.drop-before').forEach(el => el.classList.remove('drop-before'));
+            document.querySelectorAll('.drop-after').forEach(el => el.classList.remove('drop-after'));
+            if (!draggedId) return;
+
+            const items = loadItems();
+            const dragIdx = items.findIndex(i => i.id === draggedId);
+            if (dragIdx < 0) return;
+
+            // Remove dragged item
+            const [draggedItem] = items.splice(dragIdx, 1);
+            draggedItem.priority = priority;
+
+            // Figure out insert position
+            if (dropTargetId) {
+                const isAfter = dropTargetId.endsWith(':after');
+                const targetId = isAfter ? dropTargetId.replace(':after', '') : dropTargetId;
+                const targetIdx = items.findIndex(i => i.id === targetId);
+                if (targetIdx >= 0) {
+                    const insertIdx = isAfter ? targetIdx + 1 : targetIdx;
+                    items.splice(insertIdx, 0, draggedItem);
+                } else {
+                    items.push(draggedItem);
+                }
+            } else {
+                // Dropped on lane body (not on a card) — append to end of that lane
+                // Find last item in this priority lane and insert after it
+                let lastIdx = -1;
+                for (let i = items.length - 1; i >= 0; i--) {
+                    if (items[i].priority === priority) { lastIdx = i; break; }
+                }
+                if (lastIdx >= 0) {
+                    items.splice(lastIdx + 1, 0, draggedItem);
+                } else {
+                    items.push(draggedItem);
+                }
             }
 
-            let html = '';
-            items.forEach(item => {
-                const days = daysUntilDue(item.targetDate);
-                const daysClass = days <= 7 ? '#dc2626' : '#6b7280';
+            saveItems(items);
+            draggedId = null;
+            dropTargetId = null;
+            renderAll();
+        }
 
-                html += `
-                    <div class="item-card">
-                        <div class="item-header">
-                            <div style="flex: 1;">
-                                <div class="item-title">${item.item}</div>
-                                <div class="item-outcome">${item.outcome}</div>
-                            </div>
-                            <button class="btn btn-danger" onclick="deleteItem('${item.id}')">✕</button>
-                        </div>
-
-                        <div class="badges">
-                            <span class="badge ${getBadgeClass(item.lens)}">${item.lens}</span>
-                            <span class="badge badge-status ${getStatusClass(item.status)}">${item.status}</span>
-                            <span class="badge badge-status">Owner: ${item.owner}</span>
-                            <span class="badge badge-status" style="color: ${daysClass};">${item.targetDate} (${days}d)</span>
-                        </div>
-
-                        <div class="item-controls">
-                            <select onchange="updateStatus('${item.id}', this.value)">
-                                <option value="Open" ${item.status === 'Open' ? 'selected' : ''}>Open</option>
-                                <option value="In Progress" ${item.status === 'In Progress' ? 'selected' : ''}>In Progress</option>
-                                <option value="Blocked" ${item.status === 'Blocked' ? 'selected' : ''}>Blocked</option>
-                                <option value="Done" ${item.status === 'Done' ? 'selected' : ''}>Done</option>
-                            </select>
-                            <select onchange="updateDate('${item.id}', this.value)">
-                                <option value="${item.targetDate}" selected>${item.targetDate}</option>
-                                <option value="">Change date...</option>
-                            </select>
-                        </div>
+        // ── Render Card (used in lanes) ──
+        function renderCard(item) {
+            return `
+                <div class="drag-card" draggable="true"
+                     ondragstart="handleDragStart(event,'${item.id}')"
+                     ondragend="handleDragEnd(event)"
+                     ondragover="handleCardDragOver(event,'${item.id}')"
+                     ondragleave="handleCardDragLeave(event)">
+                    <div class="flex items-start justify-between gap-2 mb-1">
+                        <div class="card-title flex-1 cursor-pointer" onclick="openEditModal('${item.id}')">${item.item}</div>
+                        <button class="btn-danger flex-shrink-0" onclick="deleteItem('${item.id}')">
+                            <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
                     </div>
-                `;
-            });
-
-            listEl.innerHTML = html;
-
-            // Summary
-            const revenueCount = items.filter(i => i.lens === 'Revenue').length;
-            const costCount = items.filter(i => i.lens === 'Cost').length;
-            const efficiencyCount = items.filter(i => i.lens === 'Efficiency').length;
-
-            summaryEl.innerHTML = `
-                <div class="card">
-                    <div class="card-title">Summary</div>
-                    <div class="summary">
-                        <div class="summary-stat">
-                            <span class="summary-label">Total Items</span>
-                            <span class="summary-value">${items.length}</span>
-                        </div>
-                        <div class="summary-stat">
-                            <span class="summary-label">Revenue Focus</span>
-                            <span class="summary-value revenue">${revenueCount}</span>
-                        </div>
-                        <div class="summary-stat">
-                            <span class="summary-label">Cost Focus</span>
-                            <span class="summary-value cost">${costCount}</span>
-                        </div>
-                        <div class="summary-stat">
-                            <span class="summary-label">Efficiency Focus</span>
-                            <span class="summary-value efficiency">${efficiencyCount}</span>
-                        </div>
+                    <div class="card-outcome">${item.outcome}</div>
+                    ${item.rValue ? `<div class="text-sm font-bold text-green-700 mb-2">💰 ${formatRand(item.rValue)}</div>` : ''}
+                    <div class="card-meta">
+                        ${lensBadge(item.lens)}
+                        ${statusBadge(item.status)}
+                        <span class="badge badge-gray">${item.owner}</span>
                     </div>
                 </div>
             `;
         }
 
-        function addItem(e) {
-            e.preventDefault();
+        // ── Render Board ──
+        function renderBoard() {
+            const items = getFiltered(loadItems());
+            ['High','Medium','Low'].forEach(p => {
+                const laneItems = items.filter(i => i.priority === p);
+                document.getElementById('body-' + p).innerHTML = laneItems.length
+                    ? laneItems.map(renderCard).join('')
+                    : '<div class="text-center text-xs text-gray-400 py-8">Drag items here or click Add Item</div>';
+                document.getElementById('count-' + p).textContent = laneItems.length;
+            });
+        }
 
-            const item = {
-                id: Date.now().toString(),
-                item: document.getElementById('item').value,
-                outcome: document.getElementById('outcome').value,
-                lens: document.getElementById('lens').value,
-                owner: document.getElementById('owner').value,
-                status: document.getElementById('status').value,
-                targetDate: document.getElementById('targetDate').value,
-                createdAt: new Date().toISOString()
-            };
-
+        // ── Render Summary Cards ──
+        function renderSummaryCards() {
             const items = loadItems();
-            items.unshift(item);
-            saveItems(items);
-
-            document.getElementById('addForm').reset();
-            renderItems();
+            const high = items.filter(i => i.priority === 'High');
+            const med = items.filter(i => i.priority === 'Medium');
+            const low = items.filter(i => i.priority === 'Low');
+            const totalR = items.reduce((s, i) => s + (i.rValue || 0), 0);
+            const highR = high.reduce((s, i) => s + (i.rValue || 0), 0);
+            const medR = med.reduce((s, i) => s + (i.rValue || 0), 0);
+            const lowR = low.reduce((s, i) => s + (i.rValue || 0), 0);
+            document.getElementById('summaryCards').innerHTML = `
+                <div class="stat-card text-center" style="border-left: 4px solid #00d2a9;">
+                    <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Total Impact</p>
+                    <p class="text-2xl font-bold text-green-700 mt-1">${formatRand(totalR) || 'R 0'}</p>
+                    <p class="text-xs text-gray-400 mt-1">${items.length} items · ${items.filter(i=>i.status==='Open').length} open</p>
+                </div>
+                <div class="stat-card text-center" style="border-left: 4px solid #ef4444;">
+                    <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">🔴 High</p>
+                    <p class="text-2xl font-bold text-red-600 mt-1">${formatRand(highR) || 'R 0'}</p>
+                    <p class="text-xs text-gray-400 mt-1">${high.length} items · Next 30 days</p>
+                </div>
+                <div class="stat-card text-center" style="border-left: 4px solid #f59e0b;">
+                    <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">🟡 Medium</p>
+                    <p class="text-2xl font-bold text-amber-600 mt-1">${formatRand(medR) || 'R 0'}</p>
+                    <p class="text-xs text-gray-400 mt-1">${med.length} items · 60–90 days</p>
+                </div>
+                <div class="stat-card text-center" style="border-left: 4px solid #3b82f6;">
+                    <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">🔵 Low</p>
+                    <p class="text-2xl font-bold text-blue-600 mt-1">${formatRand(lowR) || 'R 0'}</p>
+                    <p class="text-xs text-gray-400 mt-1">${low.length} items · 90+ days</p>
+                </div>
+            `;
         }
 
-        function deleteItem(id) {
-            if (confirm('Delete this item?')) {
-                const items = loadItems();
-                saveItems(items.filter(i => i.id !== id));
-                renderItems();
+        // ── Render List ──
+        function renderList() {
+            let items = getFiltered(loadItems());
+            const sf = document.getElementById('listStatusFilter').value;
+            const pf = document.getElementById('listPriorityFilter').value;
+            if (sf !== 'all') items = items.filter(i => i.status === sf);
+            if (pf !== 'all') items = items.filter(i => i.priority === pf);
+
+            if (!items.length) {
+                document.getElementById('listContainer').innerHTML = '<div class="card p-12 text-center text-gray-400 text-sm">No items match your filters.</div>';
+                return;
             }
+
+            let html = '<div class="space-y-3">';
+            items.forEach(item => {
+                html += `
+                    <div class="card p-5">
+                        <div class="flex items-start justify-between gap-4 mb-3">
+                            <div class="flex-1 cursor-pointer" onclick="openEditModal('${item.id}')">
+                                <div class="text-sm font-semibold text-gray-900">${item.item}</div>
+                                <div class="text-xs text-gray-500 mt-1 leading-relaxed">${item.outcome}</div>
+                            </div>
+                            <button class="btn-danger" onclick="deleteItem('${item.id}')">
+                                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                            </button>
+                        </div>
+                        <div class="flex flex-wrap gap-2 items-center">
+                            ${priorityBadge(item.priority)}
+                            ${lensBadge(item.lens)}
+                            ${statusBadge(item.status)}
+                            <span class="badge badge-gray">${item.owner}</span>
+                            ${item.rValue ? `<span class="badge badge-green font-bold">💰 ${formatRand(item.rValue)}</span>` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            document.getElementById('listContainer').innerHTML = html;
         }
 
-        function updateStatus(id, status) {
+        // ── Render Summary Page ──
+        function renderSummary() {
             const items = loadItems();
-            const item = items.find(i => i.id === id);
-            if (item) {
-                item.status = status;
-                saveItems(items);
-                renderItems();
-            }
+            const lenses = ['Revenue','Cost','Efficiency'];
+            const priorities = ['High','Medium','Low'];
+            const lensColor = { Revenue:'green', Cost:'blue', Efficiency:'purple' };
+            const priColor = { High:'red', Medium:'amber', Low:'blue' };
+
+            let html = '';
+            // By Priority
+            html += '<div class="grid grid-cols-3 gap-6 mb-6">';
+            priorities.forEach(p => {
+                const pi = items.filter(i => i.priority === p);
+                html += `<div class="card overflow-hidden">
+                    <div class="card-header" style="background: ${p==='High'?'#fef2f2':p==='Medium'?'#fffbeb':'#eff6ff'}">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm font-bold text-gray-800">${p} Priority</span>
+                            <span class="badge badge-${priColor[p]}">${pi.length}</span>
+                        </div>
+                    </div>
+                    <div class="p-3 space-y-2">
+                        ${!pi.length ? '<p class="text-xs text-gray-400 text-center py-4">No items</p>' : pi.map(i => `
+                            <div class="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-gray-50">
+                                ${lensBadge(i.lens)}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>`;
+            });
+            html += '</div>';
+
+            // By Lens
+            html += '<div class="grid grid-cols-3 gap-6 mb-6">';
+            lenses.forEach(l => {
+                const li = items.filter(i => i.lens === l);
+                html += `<div class="card overflow-hidden">
+                    <div class="card-header"><div class="flex items-center justify-between">
+                        <span class="text-sm font-semibold text-gray-800">${l}</span>
+                        <span class="badge badge-${lensColor[l]}">${li.length}</span>
+                    </div></div>
+                    <div class="p-3 space-y-2">
+                        ${!li.length ? '<p class="text-xs text-gray-400 text-center py-4">No items</p>' : li.map(i => `
+                            <div class="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-gray-50">
+                                ${priorityBadge(i.priority)}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>`;
+            });
+            html += '</div>';
+
+            // Status counts
+            html += '<div class="card"><div class="card-header"><span class="text-xs font-semibold uppercase tracking-wider text-gray-500">By Status</span></div><div class="p-4"><div class="grid grid-cols-4 gap-4">';
+            ['Open','In Progress','Blocked','Done'].forEach(s => {
+                html += `<div class="text-center p-4 rounded-lg bg-gray-50"><p class="text-2xl font-bold text-gray-900">${items.filter(i=>i.status===s).length}</p><p class="text-xs text-gray-500 mt-1">${s}</p></div>`;
+            });
+            html += '</div></div></div>';
+
+            document.getElementById('summaryContent').innerHTML = html;
         }
 
-        function updateDate(id, date) {
-            if (!date) return;
-            const items = loadItems();
-            const item = items.find(i => i.id === id);
-            if (item) {
-                item.targetDate = date;
-                saveItems(items);
-                renderItems();
-            }
+        // ── Navigation ──
+        function showPage(page) {
+            currentPage = page;
+            document.querySelectorAll('[id^="page-"]').forEach(p => p.classList.add('hidden'));
+            document.getElementById('page-' + page).classList.remove('hidden');
+            ['board','list','summary'].forEach(n => document.getElementById('nav-' + n).classList.remove('active'));
+            document.getElementById('nav-' + page).classList.add('active');
+            renderAll();
         }
 
-        document.getElementById('addForm').addEventListener('submit', addItem);
-        renderItems();
+        function setLensFilter(lens) {
+            currentLensFilter = lens;
+            ['all','revenue','cost','efficiency'].forEach(n => document.getElementById('nav-' + n).classList.remove('active'));
+            document.getElementById('nav-' + (lens === 'all' ? 'all' : lens.toLowerCase())).classList.add('active');
+            renderAll();
+        }
+
+        function renderAll() {
+            renderSummaryCards();
+            if (currentPage === 'board') renderBoard();
+            if (currentPage === 'list') renderList();
+            if (currentPage === 'summary') renderSummary();
+        }
+
+        // ── Keyboard shortcut ──
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') closeModal();
+            if (e.key === 'n' && !e.ctrlKey && !e.metaKey && !['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)) openAddModal();
+        });
+
+        // Init
+        renderAll();
     </script>
 </body>
 </html>
