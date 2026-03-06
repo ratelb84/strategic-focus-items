@@ -7,6 +7,7 @@
     <title>Strategic Focus Items</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <script>
         tailwind.config = {
             theme: { extend: { fontFamily: { sans: ['Poppins', 'system-ui', 'sans-serif'] } } }
@@ -48,8 +49,6 @@
         .scroll-area::-webkit-scrollbar-track { background: transparent; }
         .scroll-area::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
         textarea.input-field { resize: vertical; min-height: 56px; }
-
-        /* Lane styling */
         .lane { background: #f3f4f6; border-radius: 12px; min-height: 400px; display: flex; flex-direction: column; }
         .lane-header { padding: 16px 20px; border-radius: 12px 12px 0 0; }
         .lane-high .lane-header { background: linear-gradient(135deg, #fef2f2, #fee2e2); border-bottom: 2px solid #fca5a5; }
@@ -57,8 +56,6 @@
         .lane-low .lane-header { background: linear-gradient(135deg, #eff6ff, #dbeafe); border-bottom: 2px solid #93c5fd; }
         .lane-body { padding: 12px; flex: 1; min-height: 200px; }
         .lane-body.drag-over { background: rgba(0,210,169,0.08); border-radius: 0 0 12px 12px; }
-
-        /* Draggable cards */
         .drag-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 14px 16px; margin-bottom: 10px; cursor: grab; transition: all 0.15s; }
         .drag-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.08); border-color: #d1d5db; }
         .drag-card:active { cursor: grabbing; }
@@ -68,178 +65,167 @@
         .drag-card .card-title { font-size: 13px; font-weight: 600; color: #111827; margin-bottom: 6px; }
         .drag-card .card-outcome { font-size: 11px; color: #6b7280; line-height: 1.4; margin-bottom: 8px; }
         .drag-card .card-meta { display: flex; flex-wrap: wrap; gap: 4px; }
+        .login-bg { background: linear-gradient(135deg, #162b3c 0%, #1e3a50 50%, #0f4c75 100%); }
     </style>
 </head>
 <body class="min-h-screen font-sans antialiased text-gray-900">
-    <div class="flex min-h-screen">
-        <!-- Sidebar -->
-        <nav class="sidebar w-60 flex flex-col flex-shrink-0 min-h-screen">
-            <div class="px-4 py-5 border-b border-white/10 flex justify-center">
-                <svg width="32" height="36" viewBox="0 0 32 36" fill="none">
+
+    <!-- ==================== LOGIN SCREEN ==================== -->
+    <div id="loginScreen" class="login-bg min-h-screen flex items-center justify-center">
+        <div class="card p-8 w-full max-w-sm">
+            <div class="text-center mb-6">
+                <svg class="mx-auto mb-3" width="40" height="44" viewBox="0 0 32 36" fill="none">
                     <path d="M16 0L30.9 8.6v17.2L16 34.4 1.1 25.8V8.6L16 0z" stroke="#00d2a9" stroke-width="2.5" fill="none"/>
                 </svg>
+                <h1 class="text-xl font-bold text-gray-900">Strategic Focus Items</h1>
+                <p class="text-xs text-gray-500 mt-1">Sign in to continue</p>
             </div>
-            <div class="flex-1 py-4 space-y-0.5">
-                <div class="px-4 pb-1">
-                    <p class="text-[10px] font-semibold uppercase tracking-wider text-gray-500">Views</p>
+            <form onsubmit="handleLogin(event)">
+                <div class="mb-3">
+                    <label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Username</label>
+                    <input type="text" id="loginUser" class="input-field w-full" placeholder="Enter username" required autofocus>
                 </div>
-                <div onclick="showPage('board')" class="nav-item active" id="nav-board">
-                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 4.5v15m6-15v15m-10.875 0h15.75c.621 0 1.125-.504 1.125-1.125V5.625c0-.621-.504-1.125-1.125-1.125H4.125C3.504 4.5 3 5.004 3 5.625v12.75c0 .621.504 1.125 1.125 1.125z"/></svg>
-                    Priority Board
+                <div class="mb-4">
+                    <label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Password</label>
+                    <input type="password" id="loginPass" class="input-field w-full" placeholder="Enter password" required>
                 </div>
-                <div onclick="showPage('list')" class="nav-item" id="nav-list">
-                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/></svg>
-                    List View
-                </div>
-                <div onclick="showPage('summary')" class="nav-item" id="nav-summary">
-                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"/></svg>
-                    Summary
-                </div>
+                <div id="loginError" class="text-xs text-red-600 mb-3 hidden"></div>
+                <button type="submit" class="btn btn-teal w-full justify-center" id="loginBtn">
+                    Sign In
+                </button>
+            </form>
+        </div>
+    </div>
 
-                <div class="px-4 pt-5 pb-1">
-                    <p class="text-[10px] font-semibold uppercase tracking-wider text-gray-500">Filter by Lens</p>
+    <!-- ==================== MAIN APP (hidden until login) ==================== -->
+    <div id="mainApp" class="hidden">
+        <div class="flex min-h-screen">
+            <!-- Sidebar -->
+            <nav class="sidebar w-60 flex flex-col flex-shrink-0 min-h-screen">
+                <div class="px-4 py-5 border-b border-white/10 flex justify-center">
+                    <svg width="32" height="36" viewBox="0 0 32 36" fill="none">
+                        <path d="M16 0L30.9 8.6v17.2L16 34.4 1.1 25.8V8.6L16 0z" stroke="#00d2a9" stroke-width="2.5" fill="none"/>
+                    </svg>
                 </div>
-                <div onclick="setLensFilter('all')" class="nav-item active" id="nav-all">
-                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"/></svg>
-                    All
-                </div>
-                <div onclick="setLensFilter('Revenue')" class="nav-item" id="nav-revenue">
-                    <span class="inline-block w-2.5 h-2.5 rounded-full bg-green-500 ml-0.5 mr-1"></span>
-                    Revenue
-                </div>
-                <div onclick="setLensFilter('Cost')" class="nav-item" id="nav-cost">
-                    <span class="inline-block w-2.5 h-2.5 rounded-full bg-blue-500 ml-0.5 mr-1"></span>
-                    Cost
-                </div>
-                <div onclick="setLensFilter('Efficiency')" class="nav-item" id="nav-efficiency">
-                    <span class="inline-block w-2.5 h-2.5 rounded-full bg-purple-500 ml-0.5 mr-1"></span>
-                    Efficiency
-                </div>
-            </div>
-            <div class="px-4 py-3 border-t border-white/10">
-                <p class="text-[10px] text-gray-500">Strategic Focus Items v2.0</p>
-            </div>
-        </nav>
+                <div class="flex-1 py-4 space-y-0.5">
+                    <div class="px-4 pb-1">
+                        <p class="text-[10px] font-semibold uppercase tracking-wider text-gray-500">Views</p>
+                    </div>
+                    <div onclick="showPage('board')" class="nav-item active" id="nav-board">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 4.5v15m6-15v15m-10.875 0h15.75c.621 0 1.125-.504 1.125-1.125V5.625c0-.621-.504-1.125-1.125-1.125H4.125C3.504 4.5 3 5.004 3 5.625v12.75c0 .621.504 1.125 1.125 1.125z"/></svg>
+                        Priority Board
+                    </div>
+                    <div onclick="showPage('list')" class="nav-item" id="nav-list">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/></svg>
+                        List View
+                    </div>
+                    <div onclick="showPage('summary')" class="nav-item" id="nav-summary">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"/></svg>
+                        Summary
+                    </div>
 
-        <!-- Main -->
-        <main class="flex-1 overflow-y-auto scroll-area">
-            <!-- Top bar -->
-            <div class="topbar flex items-center justify-between px-8 py-3 sticky top-0 z-10">
-                <h2 class="text-sm font-semibold text-gray-800" id="topBarLabel">Strategic Focus Items</h2>
-                <div class="flex items-center gap-4">
-                    <button class="btn btn-teal text-xs" onclick="openAddModal()">
-                        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                        Add Item
-                    </button>
-                    <div class="h-5 w-px bg-gray-200"></div>
-                    <div class="flex items-center gap-2">
-                        <div class="h-7 w-7 rounded-full bg-[#162b3c] flex items-center justify-center text-white text-xs font-semibold">D</div>
-                        <span class="text-xs font-medium text-gray-700">Don</span>
+                    <div class="px-4 pt-5 pb-1">
+                        <p class="text-[10px] font-semibold uppercase tracking-wider text-gray-500">Filter by Lens</p>
+                    </div>
+                    <div onclick="setLensFilter('all')" class="nav-item active" id="nav-all">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"/></svg>
+                        All
+                    </div>
+                    <div onclick="setLensFilter('Revenue')" class="nav-item" id="nav-revenue">
+                        <span class="inline-block w-2.5 h-2.5 rounded-full bg-green-500 ml-0.5 mr-1"></span>
+                        Revenue
+                    </div>
+                    <div onclick="setLensFilter('Cost')" class="nav-item" id="nav-cost">
+                        <span class="inline-block w-2.5 h-2.5 rounded-full bg-blue-500 ml-0.5 mr-1"></span>
+                        Cost
+                    </div>
+                    <div onclick="setLensFilter('Efficiency')" class="nav-item" id="nav-efficiency">
+                        <span class="inline-block w-2.5 h-2.5 rounded-full bg-purple-500 ml-0.5 mr-1"></span>
+                        Efficiency
                     </div>
                 </div>
-            </div>
-
-            <!-- ==================== BOARD PAGE (PRIORITY LANES) ==================== -->
-            <div id="page-board" class="p-8">
-                <div class="mb-6">
-                    <h1 class="text-2xl font-bold text-gray-900">Priority Board</h1>
-                    <p class="text-sm text-gray-500 mt-1">Drag items between lanes to reprioritize. Drop into a lane to change priority.</p>
+                <div class="px-4 py-3 border-t border-white/10">
+                    <div class="flex items-center justify-between">
+                        <p class="text-[10px] text-gray-500">Strategic Focus Items v3.0</p>
+                        <button onclick="handleLogout()" class="text-[10px] text-gray-500 hover:text-red-400 cursor-pointer">Logout</button>
+                    </div>
                 </div>
+            </nav>
 
-                <!-- Summary Cards -->
-                <div class="grid grid-cols-4 gap-4 mb-6" id="summaryCards"></div>
-
-                <!-- Priority Lanes -->
-                <div class="grid grid-cols-3 gap-6" id="laneContainer">
-                    <div class="lane lane-high" id="lane-High" ondragover="handleDragOver(event)" ondrop="handleDrop(event, 'High')" ondragleave="handleDragLeave(event)">
-                        <div class="lane-header">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-2">
-                                    <span class="text-lg">🔴</span>
-                                    <div>
-                                        <p class="text-sm font-bold text-red-800">HIGH</p>
-                                        <p class="text-[10px] text-red-600 font-medium">Next 30 Days</p>
-                                    </div>
-                                </div>
-                                <span class="badge badge-red" id="count-High">0</span>
-                            </div>
+            <!-- Main -->
+            <main class="flex-1 overflow-y-auto scroll-area">
+                <!-- Top bar -->
+                <div class="topbar flex items-center justify-between px-8 py-3 sticky top-0 z-10">
+                    <h2 class="text-sm font-semibold text-gray-800" id="topBarLabel">Strategic Focus Items</h2>
+                    <div class="flex items-center gap-4">
+                        <button class="btn btn-teal text-xs" onclick="openAddModal()">
+                            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                            Add Item
+                        </button>
+                        <div class="h-5 w-px bg-gray-200"></div>
+                        <div class="flex items-center gap-2">
+                            <div id="userAvatar" class="h-7 w-7 rounded-full flex items-center justify-center text-white text-xs font-semibold"></div>
+                            <span id="userName" class="text-xs font-medium text-gray-700"></span>
                         </div>
-                        <div class="lane-body" id="body-High"></div>
                     </div>
+                </div>
 
-                    <div class="lane lane-medium" id="lane-Medium" ondragover="handleDragOver(event)" ondrop="handleDrop(event, 'Medium')" ondragleave="handleDragLeave(event)">
-                        <div class="lane-header">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-2">
-                                    <span class="text-lg">🟡</span>
-                                    <div>
-                                        <p class="text-sm font-bold text-amber-800">MEDIUM</p>
-                                        <p class="text-[10px] text-amber-600 font-medium">60–90 Days</p>
-                                    </div>
-                                </div>
-                                <span class="badge badge-amber" id="count-Medium">0</span>
-                            </div>
+                <!-- ==================== BOARD PAGE ==================== -->
+                <div id="page-board" class="p-8">
+                    <div class="mb-6">
+                        <h1 class="text-2xl font-bold text-gray-900">Priority Board</h1>
+                        <p class="text-sm text-gray-500 mt-1">Drag items between lanes to reprioritize. Drop into a lane to change priority.</p>
+                    </div>
+                    <div class="grid grid-cols-4 gap-4 mb-6" id="summaryCards"></div>
+                    <div class="grid grid-cols-3 gap-6" id="laneContainer">
+                        <div class="lane lane-high" id="lane-High" ondragover="handleDragOver(event)" ondrop="handleDrop(event, 'High')" ondragleave="handleDragLeave(event)">
+                            <div class="lane-header"><div class="flex items-center justify-between"><div class="flex items-center gap-2"><span class="text-lg">🔴</span><div><p class="text-sm font-bold text-red-800">HIGH</p><p class="text-[10px] text-red-600 font-medium">Next 30 Days</p></div></div><span class="badge badge-red" id="count-High">0</span></div></div>
+                            <div class="lane-body" id="body-High"></div>
                         </div>
-                        <div class="lane-body" id="body-Medium"></div>
-                    </div>
-
-                    <div class="lane lane-low" id="lane-Low" ondragover="handleDragOver(event)" ondrop="handleDrop(event, 'Low')" ondragleave="handleDragLeave(event)">
-                        <div class="lane-header">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-2">
-                                    <span class="text-lg">🔵</span>
-                                    <div>
-                                        <p class="text-sm font-bold text-blue-800">LOW</p>
-                                        <p class="text-[10px] text-blue-600 font-medium">90+ Days</p>
-                                    </div>
-                                </div>
-                                <span class="badge badge-blue" id="count-Low">0</span>
-                            </div>
+                        <div class="lane lane-medium" id="lane-Medium" ondragover="handleDragOver(event)" ondrop="handleDrop(event, 'Medium')" ondragleave="handleDragLeave(event)">
+                            <div class="lane-header"><div class="flex items-center justify-between"><div class="flex items-center gap-2"><span class="text-lg">🟡</span><div><p class="text-sm font-bold text-amber-800">MEDIUM</p><p class="text-[10px] text-amber-600 font-medium">60–90 Days</p></div></div><span class="badge badge-amber" id="count-Medium">0</span></div></div>
+                            <div class="lane-body" id="body-Medium"></div>
                         </div>
-                        <div class="lane-body" id="body-Low"></div>
+                        <div class="lane lane-low" id="lane-Low" ondragover="handleDragOver(event)" ondrop="handleDrop(event, 'Low')" ondragleave="handleDragLeave(event)">
+                            <div class="lane-header"><div class="flex items-center justify-between"><div class="flex items-center gap-2"><span class="text-lg">🔵</span><div><p class="text-sm font-bold text-blue-800">LOW</p><p class="text-[10px] text-blue-600 font-medium">90+ Days</p></div></div><span class="badge badge-blue" id="count-Low">0</span></div></div>
+                            <div class="lane-body" id="body-Low"></div>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- ==================== LIST PAGE ==================== -->
-            <div id="page-list" class="p-8 hidden">
-                <div class="mb-6">
-                    <h1 class="text-2xl font-bold text-gray-900">All Items</h1>
-                    <p class="text-sm text-gray-500 mt-1">Full list of strategic focus items</p>
-                </div>
-                <div class="flex items-center gap-4 mb-6">
-                    <div class="flex items-center gap-2">
-                        <span class="text-xs text-gray-500">Status</span>
-                        <select id="listStatusFilter" onchange="renderList()" class="select-field text-sm">
-                            <option value="all">All</option>
-                            <option value="Open">Open</option>
-                            <option value="In Progress">In Progress</option>
-                            <option value="Blocked">Blocked</option>
-                            <option value="Done">Done</option>
-                        </select>
+                <!-- ==================== LIST PAGE ==================== -->
+                <div id="page-list" class="p-8 hidden">
+                    <div class="mb-6">
+                        <h1 class="text-2xl font-bold text-gray-900">All Items</h1>
+                        <p class="text-sm text-gray-500 mt-1">Full list of strategic focus items</p>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <span class="text-xs text-gray-500">Priority</span>
-                        <select id="listPriorityFilter" onchange="renderList()" class="select-field text-sm">
-                            <option value="all">All</option>
-                            <option value="High">High</option>
-                            <option value="Medium">Medium</option>
-                            <option value="Low">Low</option>
-                        </select>
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs text-gray-500">Status</span>
+                            <select id="listStatusFilter" onchange="renderList()" class="select-field text-sm">
+                                <option value="all">All</option><option value="Open">Open</option><option value="In Progress">In Progress</option><option value="Blocked">Blocked</option><option value="Done">Done</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs text-gray-500">Priority</span>
+                            <select id="listPriorityFilter" onchange="renderList()" class="select-field text-sm">
+                                <option value="all">All</option><option value="High">High</option><option value="Medium">Medium</option><option value="Low">Low</option>
+                            </select>
+                        </div>
                     </div>
+                    <div id="listContainer"></div>
                 </div>
-                <div id="listContainer"></div>
-            </div>
 
-            <!-- ==================== SUMMARY PAGE ==================== -->
-            <div id="page-summary" class="p-8 hidden">
-                <div class="mb-6">
-                    <h1 class="text-2xl font-bold text-gray-900">Summary</h1>
-                    <p class="text-sm text-gray-500 mt-1">Overview by lens, priority, and status</p>
+                <!-- ==================== SUMMARY PAGE ==================== -->
+                <div id="page-summary" class="p-8 hidden">
+                    <div class="mb-6">
+                        <h1 class="text-2xl font-bold text-gray-900">Summary</h1>
+                        <p class="text-sm text-gray-500 mt-1">Overview by lens, priority, and status</p>
+                    </div>
+                    <div id="summaryContent"></div>
                 </div>
-                <div id="summaryContent"></div>
-            </div>
-        </main>
+            </main>
+        </div>
     </div>
 
     <!-- Add/Edit Modal -->
@@ -314,38 +300,125 @@
     </div>
 
     <script>
-        const STORAGE_KEY = 'strategic-focus-items-v2';
+        // ── Supabase Setup ──
+        const SUPABASE_URL = 'https://hqfszlxdkvwlvpwqqmbd.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhxZnN6bHhka3Z3bHZwd3FxbWJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI1NTExODgsImV4cCI6MjA4ODEyNzE4OH0.4OlPny5uJFTslf6iWfF7fAaVl0x2I_VG63QPa1Amq8Q';
+        const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        let currentUser = null;
+        let items = [];
         let currentPage = 'board';
         let currentLensFilter = 'all';
         let draggedId = null;
+        let dropTargetId = null;
 
-        // ── Data ──
-        function loadItems() {
-            const saved = localStorage.getItem(STORAGE_KEY);
-            if (saved) return JSON.parse(saved);
-            // migrate from v1
-            const v1 = localStorage.getItem('strategic-focus-items');
-            if (v1) {
-                const items = JSON.parse(v1).map(i => ({ ...i, priority: i.priority || 'Medium' }));
-                saveItems(items);
-                return items;
+        // ── Login ──
+        async function handleLogin(e) {
+            e.preventDefault();
+            const user = document.getElementById('loginUser').value.trim().toLowerCase();
+            const pass = document.getElementById('loginPass').value;
+            const errEl = document.getElementById('loginError');
+            errEl.classList.add('hidden');
+
+            const { data, error } = await sb.from('strategic_users').select('*').eq('username', user).eq('password', pass).single();
+            if (error || !data) {
+                errEl.textContent = 'Invalid username or password';
+                errEl.classList.remove('hidden');
+                return;
             }
-            return [];
+
+            currentUser = data;
+            sessionStorage.setItem('sfi_user', JSON.stringify(data));
+            showApp();
         }
 
-        function saveItems(items) {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+        function handleLogout() {
+            sessionStorage.removeItem('sfi_user');
+            currentUser = null;
+            document.getElementById('mainApp').classList.add('hidden');
+            document.getElementById('loginScreen').classList.remove('hidden');
         }
 
-        function getFiltered(items) {
-            if (currentLensFilter !== 'all') items = items.filter(i => i.lens === currentLensFilter);
-            return items;
+        function showApp() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
+            document.getElementById('userAvatar').style.background = currentUser.color;
+            document.getElementById('userAvatar').textContent = currentUser.display_name[0];
+            document.getElementById('userName').textContent = currentUser.display_name;
+            loadItems();
+        }
+
+        // ── Check session on load ──
+        function checkSession() {
+            const saved = sessionStorage.getItem('sfi_user');
+            if (saved) {
+                currentUser = JSON.parse(saved);
+                showApp();
+            }
+        }
+
+        // ── Data (Supabase) ──
+        async function loadItems() {
+            const { data, error } = await sb.from('strategic_items').select('*').order('sort_order', { ascending: true });
+            if (error) { console.error('Load error:', error); return; }
+            items = (data || []).map(row => ({
+                id: row.id,
+                item: row.item,
+                outcome: row.outcome,
+                lens: row.lens,
+                priority: row.priority,
+                owner: row.owner,
+                status: row.status,
+                rValue: parseFloat(row.r_value) || 0,
+                sortOrder: row.sort_order || 0,
+                createdAt: row.created_at
+            }));
+            renderAll();
+        }
+
+        async function upsertItem(item) {
+            const row = {
+                id: item.id,
+                item: item.item,
+                outcome: item.outcome,
+                lens: item.lens,
+                priority: item.priority,
+                owner: item.owner,
+                status: item.status,
+                r_value: item.rValue || 0,
+                sort_order: item.sortOrder || 0,
+                updated_at: new Date().toISOString()
+            };
+            const { error } = await sb.from('strategic_items').upsert(row);
+            if (error) console.error('Upsert error:', error);
+        }
+
+        async function removeItem(id) {
+            const { error } = await sb.from('strategic_items').delete().eq('id', id);
+            if (error) console.error('Delete error:', error);
+        }
+
+        function getFiltered() {
+            let filtered = [...items];
+            if (currentLensFilter !== 'all') filtered = filtered.filter(i => i.lens === currentLensFilter);
+            return filtered;
+        }
+
+        // ── Realtime subscription ──
+        function subscribeRealtime() {
+            sb.channel('strategic_items_changes')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'strategic_items' }, () => {
+                    loadItems();
+                })
+                .subscribe();
         }
 
         // ── Helpers ──
-        function daysUntilDue(d) {
-            const today = new Date(); today.setHours(0,0,0,0);
-            return Math.ceil((new Date(d+'T00:00:00') - today) / 86400000);
+        function formatRand(v) {
+            if (!v || v === 0) return null;
+            if (v >= 1000000) return 'R ' + (v / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
+            if (v >= 1000) return 'R ' + (v / 1000).toFixed(0) + 'K';
+            return 'R ' + v.toLocaleString();
         }
 
         function lensBadge(l) {
@@ -365,23 +438,6 @@
             return `<span class="badge ${m[p]}">${i[p]} ${p}</span>`;
         }
 
-        function formatRand(v) {
-            if (!v || v === 0) return null;
-            if (v >= 1000000) return 'R ' + (v / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
-            if (v >= 1000) return 'R ' + (v / 1000).toFixed(0) + 'K';
-            return 'R ' + v.toLocaleString();
-        }
-
-        function dateBadge(d) {
-            const days = daysUntilDue(d);
-            let cls = 'badge-gray', label = days + 'd';
-            if (days < 0) { cls = 'badge-red'; label = Math.abs(days) + 'd overdue'; }
-            else if (days <= 3) { cls = 'badge-red'; label = days + 'd left'; }
-            else if (days <= 7) { cls = 'badge-amber'; label = days + 'd left'; }
-            else { label = days + 'd left'; }
-            return `<span class="badge ${cls}">${d} · ${label}</span>`;
-        }
-
         // ── Modal ──
         function openAddModal(priority) {
             document.getElementById('f_id').value = '';
@@ -389,7 +445,7 @@
             document.getElementById('f_outcome').value = '';
             document.getElementById('f_lens').value = 'Cost';
             document.getElementById('f_priority').value = priority || 'High';
-            document.getElementById('f_owner').value = 'Don';
+            document.getElementById('f_owner').value = currentUser ? currentUser.display_name : 'Don';
             document.getElementById('f_status').value = 'Open';
             document.getElementById('f_rValue').value = '';
             document.getElementById('modalTitle').textContent = 'Add New Item';
@@ -399,7 +455,7 @@
         }
 
         function openEditModal(id) {
-            const item = loadItems().find(i => i.id === id);
+            const item = items.find(i => i.id === id);
             if (!item) return;
             document.getElementById('f_id').value = item.id;
             document.getElementById('f_item').value = item.item;
@@ -419,7 +475,7 @@
             document.getElementById('modal').classList.add('hidden');
         }
 
-        function saveItem(e) {
+        async function saveItem(e) {
             e.preventDefault();
             const id = document.getElementById('f_id').value;
             const data = {
@@ -432,28 +488,25 @@
                 rValue: parseFloat(document.getElementById('f_rValue').value) || 0,
             };
 
-            const items = loadItems();
             if (id) {
-                const idx = items.findIndex(i => i.id === id);
-                if (idx >= 0) items[idx] = { ...items[idx], ...data };
+                const existing = items.find(i => i.id === id);
+                const updated = { ...existing, ...data };
+                await upsertItem(updated);
             } else {
-                items.unshift({ id: Date.now().toString(), ...data, createdAt: new Date().toISOString() });
+                const newItem = { id: Date.now().toString(), ...data, sortOrder: 0, createdAt: new Date().toISOString() };
+                await upsertItem(newItem);
             }
-            saveItems(items);
             closeModal();
-            renderAll();
+            await loadItems();
         }
 
-        function deleteItem(id) {
+        async function deleteItem(id) {
             if (!confirm('Delete this item?')) return;
-            saveItems(loadItems().filter(i => i.id !== id));
-            renderAll();
+            await removeItem(id);
+            await loadItems();
         }
 
-        // ── Drag & Drop (with reorder within lanes) ──
-        let dropTargetId = null; // id of card we're hovering over (insert before)
-        let dropIndicator = null;
-
+        // ── Drag & Drop ──
         function handleDragStart(e, id) {
             draggedId = id;
             e.target.classList.add('dragging');
@@ -484,7 +537,6 @@
             e.preventDefault();
             e.stopPropagation();
             e.dataTransfer.dropEffect = 'move';
-            // Show drop indicator
             document.querySelectorAll('.drop-before').forEach(el => el.classList.remove('drop-before'));
             document.querySelectorAll('.drop-after').forEach(el => el.classList.remove('drop-after'));
             const card = e.currentTarget;
@@ -503,53 +555,48 @@
             e.currentTarget.classList.remove('drop-before', 'drop-after');
         }
 
-        function handleDrop(e, priority) {
+        async function handleDrop(e, priority) {
             e.preventDefault();
             document.querySelectorAll('.lane-body').forEach(b => b.classList.remove('drag-over'));
             document.querySelectorAll('.drop-before').forEach(el => el.classList.remove('drop-before'));
             document.querySelectorAll('.drop-after').forEach(el => el.classList.remove('drop-after'));
             if (!draggedId) return;
 
-            const items = loadItems();
             const dragIdx = items.findIndex(i => i.id === draggedId);
             if (dragIdx < 0) return;
 
-            // Remove dragged item
             const [draggedItem] = items.splice(dragIdx, 1);
             draggedItem.priority = priority;
 
-            // Figure out insert position
             if (dropTargetId) {
                 const isAfter = dropTargetId.endsWith(':after');
                 const targetId = isAfter ? dropTargetId.replace(':after', '') : dropTargetId;
                 const targetIdx = items.findIndex(i => i.id === targetId);
                 if (targetIdx >= 0) {
-                    const insertIdx = isAfter ? targetIdx + 1 : targetIdx;
-                    items.splice(insertIdx, 0, draggedItem);
+                    items.splice(isAfter ? targetIdx + 1 : targetIdx, 0, draggedItem);
                 } else {
                     items.push(draggedItem);
                 }
             } else {
-                // Dropped on lane body (not on a card) — append to end of that lane
-                // Find last item in this priority lane and insert after it
                 let lastIdx = -1;
                 for (let i = items.length - 1; i >= 0; i--) {
                     if (items[i].priority === priority) { lastIdx = i; break; }
                 }
-                if (lastIdx >= 0) {
-                    items.splice(lastIdx + 1, 0, draggedItem);
-                } else {
-                    items.push(draggedItem);
-                }
+                items.splice(lastIdx >= 0 ? lastIdx + 1 : items.length, 0, draggedItem);
             }
 
-            saveItems(items);
+            // Update sort orders and save
+            for (let i = 0; i < items.length; i++) {
+                items[i].sortOrder = i;
+            }
+            await Promise.all(items.map(item => upsertItem(item)));
+
             draggedId = null;
             dropTargetId = null;
             renderAll();
         }
 
-        // ── Render Card (used in lanes) ──
+        // ── Render Card ──
         function renderCard(item) {
             return `
                 <div class="drag-card" draggable="true"
@@ -581,9 +628,9 @@
 
         // ── Render Board ──
         function renderBoard() {
-            const items = getFiltered(loadItems());
+            const filtered = getFiltered();
             ['High','Medium','Low'].forEach(p => {
-                const laneItems = items.filter(i => i.priority === p);
+                const laneItems = filtered.filter(i => i.priority === p);
                 document.getElementById('body-' + p).innerHTML = laneItems.length
                     ? laneItems.map(renderCard).join('')
                     : '<div class="text-center text-xs text-gray-400 py-8">Drag items here or click Add Item</div>';
@@ -593,7 +640,6 @@
 
         // ── Render Summary Cards ──
         function renderSummaryCards() {
-            const items = loadItems();
             const high = items.filter(i => i.priority === 'High');
             const med = items.filter(i => i.priority === 'Medium');
             const low = items.filter(i => i.priority === 'Low');
@@ -627,19 +673,19 @@
 
         // ── Render List ──
         function renderList() {
-            let items = getFiltered(loadItems());
+            let filtered = getFiltered();
             const sf = document.getElementById('listStatusFilter').value;
             const pf = document.getElementById('listPriorityFilter').value;
-            if (sf !== 'all') items = items.filter(i => i.status === sf);
-            if (pf !== 'all') items = items.filter(i => i.priority === pf);
+            if (sf !== 'all') filtered = filtered.filter(i => i.status === sf);
+            if (pf !== 'all') filtered = filtered.filter(i => i.priority === pf);
 
-            if (!items.length) {
+            if (!filtered.length) {
                 document.getElementById('listContainer').innerHTML = '<div class="card p-12 text-center text-gray-400 text-sm">No items match your filters.</div>';
                 return;
             }
 
             let html = '<div class="space-y-3">';
-            items.forEach(item => {
+            filtered.forEach(item => {
                 html += `
                     <div class="card p-5">
                         <div class="flex items-start justify-between gap-4 mb-3">
@@ -667,28 +713,31 @@
 
         // ── Render Summary Page ──
         function renderSummary() {
-            const items = loadItems();
             const lenses = ['Revenue','Cost','Efficiency'];
             const priorities = ['High','Medium','Low'];
             const lensColor = { Revenue:'green', Cost:'blue', Efficiency:'purple' };
             const priColor = { High:'red', Medium:'amber', Low:'blue' };
 
             let html = '';
-            // By Priority
             html += '<div class="grid grid-cols-3 gap-6 mb-6">';
             priorities.forEach(p => {
                 const pi = items.filter(i => i.priority === p);
+                const pR = pi.reduce((s, i) => s + (i.rValue || 0), 0);
                 html += `<div class="card overflow-hidden">
                     <div class="card-header" style="background: ${p==='High'?'#fef2f2':p==='Medium'?'#fffbeb':'#eff6ff'}">
                         <div class="flex items-center justify-between">
                             <span class="text-sm font-bold text-gray-800">${p} Priority</span>
-                            <span class="badge badge-${priColor[p]}">${pi.length}</span>
+                            <div class="text-right">
+                                <span class="badge badge-${priColor[p]}">${pi.length}</span>
+                                ${pR ? `<div class="text-xs font-bold text-green-700 mt-1">${formatRand(pR)}</div>` : ''}
+                            </div>
                         </div>
                     </div>
                     <div class="p-3 space-y-2">
                         ${!pi.length ? '<p class="text-xs text-gray-400 text-center py-4">No items</p>' : pi.map(i => `
                             <div class="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-gray-50">
-                                ${lensBadge(i.lens)}
+                                <div class="flex items-center gap-2">${lensBadge(i.lens)}<span class="text-xs text-gray-700">${i.item}</span></div>
+                                ${i.rValue ? `<span class="text-xs font-bold text-green-700">${formatRand(i.rValue)}</span>` : ''}
                             </div>
                         `).join('')}
                     </div>
@@ -696,19 +745,23 @@
             });
             html += '</div>';
 
-            // By Lens
             html += '<div class="grid grid-cols-3 gap-6 mb-6">';
             lenses.forEach(l => {
                 const li = items.filter(i => i.lens === l);
+                const lR = li.reduce((s, i) => s + (i.rValue || 0), 0);
                 html += `<div class="card overflow-hidden">
                     <div class="card-header"><div class="flex items-center justify-between">
                         <span class="text-sm font-semibold text-gray-800">${l}</span>
-                        <span class="badge badge-${lensColor[l]}">${li.length}</span>
+                        <div class="text-right">
+                            <span class="badge badge-${lensColor[l]}">${li.length}</span>
+                            ${lR ? `<div class="text-xs font-bold text-green-700 mt-1">${formatRand(lR)}</div>` : ''}
+                        </div>
                     </div></div>
                     <div class="p-3 space-y-2">
                         ${!li.length ? '<p class="text-xs text-gray-400 text-center py-4">No items</p>' : li.map(i => `
                             <div class="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-gray-50">
-                                ${priorityBadge(i.priority)}
+                                <div class="flex items-center gap-2">${priorityBadge(i.priority)}<span class="text-xs text-gray-700">${i.item}</span></div>
+                                ${i.rValue ? `<span class="text-xs font-bold text-green-700">${formatRand(i.rValue)}</span>` : ''}
                             </div>
                         `).join('')}
                     </div>
@@ -716,7 +769,6 @@
             });
             html += '</div>';
 
-            // Status counts
             html += '<div class="card"><div class="card-header"><span class="text-xs font-semibold uppercase tracking-wider text-gray-500">By Status</span></div><div class="p-4"><div class="grid grid-cols-4 gap-4">';
             ['Open','In Progress','Blocked','Done'].forEach(s => {
                 html += `<div class="text-center p-4 rounded-lg bg-gray-50"><p class="text-2xl font-bold text-gray-900">${items.filter(i=>i.status===s).length}</p><p class="text-xs text-gray-500 mt-1">${s}</p></div>`;
@@ -750,14 +802,15 @@
             if (currentPage === 'summary') renderSummary();
         }
 
-        // ── Keyboard shortcut ──
+        // ── Keyboard shortcuts ──
         document.addEventListener('keydown', e => {
             if (e.key === 'Escape') closeModal();
             if (e.key === 'n' && !e.ctrlKey && !e.metaKey && !['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)) openAddModal();
         });
 
-        // Init
-        renderAll();
+        // ── Init ──
+        subscribeRealtime();
+        checkSession();
     </script>
 </body>
 </html>
